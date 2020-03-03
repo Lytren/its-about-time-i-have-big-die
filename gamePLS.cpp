@@ -93,9 +93,6 @@ void initWorld()
 
 void printWorld()
 {
-	while (gameOver == false) 
-	{
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	if (goForIt == true)
 	{
 		clear();
@@ -120,8 +117,7 @@ void printWorld()
 		if (beginning == true) { beginning = false; }
 		goForIt = true;
 	}
-		refresh();
-	}
+	refresh();
 }
 
 void frick_A_Bullet()
@@ -137,6 +133,7 @@ void frick_A_Bullet()
 	
 	while (b.cont == true)
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		switch (b.direction)
 		{
 		case 'w':
@@ -144,7 +141,7 @@ void frick_A_Bullet()
 			{
 				b.y--;
 				world[b.y][b.x] = '+';
-				//printWorld();
+				printWorld();
 				world[b.y][b.x] = ' ';
 			}
 			else
@@ -152,7 +149,7 @@ void frick_A_Bullet()
 				b.cont = false;
 				b.y--;
 				world[b.y][b.x] = '+';
-				//printWorld();
+				printWorld();
 				world[b.y][b.x] = ' ';
 			}
 			break;
@@ -161,7 +158,7 @@ void frick_A_Bullet()
 			{
 				b.x--;
 				world[b.y][b.x] = '+';
-				//printWorld();
+				printWorld();
 				world[b.y][b.x] = ' ';
 			}
 			else
@@ -169,7 +166,7 @@ void frick_A_Bullet()
 				b.cont = false;
 				b.x--;
 				world[b.y][b.x] = '+';
-				//printWorld();
+				printWorld();
 				world[b.y][b.x] = ' ';
 			}
 			break;
@@ -178,7 +175,7 @@ void frick_A_Bullet()
 			{
 				b.y++;
 				world[b.y][b.x] = '+';
-				//printWorld();
+				printWorld();
 				world[b.y][b.x] = ' ';
 			}
 			else
@@ -186,7 +183,7 @@ void frick_A_Bullet()
 				b.cont = false;
 				b.y++;
 				world[b.y][b.x] = '+';
-				//printWorld();
+				printWorld();
 				world[b.y][b.x] = ' ';
 			}
 			break;
@@ -195,7 +192,7 @@ void frick_A_Bullet()
 			{
 				b.x++;
 				world[b.y][b.x] = '+';
-				//printWorld();
+				printWorld();
 				world[b.y][b.x] = ' ';
 			}
 			else
@@ -203,20 +200,26 @@ void frick_A_Bullet()
 				b.cont = false;
 				b.x++;
 				world[b.y][b.x] = '+';
-				//printWorld();
+				printWorld();
 				world[b.y][b.x] = ' ';
 			}
 			break;
 		}
 	}
-	//printWorld();
+	printWorld();
 }
 
+void bulletController() 
+{
+	bulletOrNaw = false;
+	thread t1(frick_A_Bullet);
+	t1.detach();
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	bulletOrNaw = true;
+}
 
 void singleMode()
 {	
-	thread E(printWorld);
-	E.detach();
 	while (gameOver == false)
 	{
 		if (beginning == true) { printWorld(); }
@@ -242,13 +245,16 @@ void singleMode()
 			break;
 
 		case ' ':
-			frick_A_Bullet();
+			if (bulletOrNaw == true) 
+			{
+				bulletController();
+			}
 			break;
 		}
 		if (enteredKey != ' ')
 		{
 			p1.direction = enteredKey;
-			//printWorld();
+			printWorld();
 		}
 	}
 }
@@ -263,6 +269,34 @@ void multiMode()
 }
 
 
+/*
+void titleScreen(int* x, bool* y) 
+{
+	
+	clock_t killMe;
+	double time;
+	killMe = clock();
+	time = (std::clock() - killMe) / (double)CLOCKS_PER_SEC;
+	
+	
+	bool end = false;
+	int option = 1;
+	char input;
+	
+	while (end == false)
+	{
+		input = _getch();
+		if (input == 'w' || input == 's') 
+		{
+			if (input == 's' && option == 1) { option++; }
+			if (input == 'w' && option == 2) { option--; }
+		}
+		*x = option;
+		if (input == 13) { *y = true; end = true; }
+	}
+}
+*/
+
 int main()
 {
 	initWorld();
@@ -270,7 +304,9 @@ int main()
 
 	string lel;
 	int optionPicked = 1;
+	//int* changeThis = &optionPicked;
 	bool enter = false;
+	//bool* changeEnter = &enter;
 	char input;
 
 	while (leaveGame == false)
@@ -288,8 +324,6 @@ int main()
 			lel = " " + lel;
 		}
 		printw("%s \n\n", lel.c_str());
-		
-		
 
 		lel = SUBTITLENAME;
 		gosh = WORLD_X - lel.size();
@@ -303,8 +337,6 @@ int main()
 			lel = " " + lel;
 		}
 		printw("%s \n\n", lel.c_str());
-		
-		
 
 		string lol = "Singleplayer";
 		gosh = WORLD_X - lol.size();
@@ -319,8 +351,6 @@ int main()
 			lol = " " + lol;
 		}
 		printw("%s \n\n", lol.c_str());
-		
-		
 
 		lol = "Multi-player";
 		gosh = WORLD_X - lol.size();
@@ -342,5 +372,37 @@ int main()
 		if (input == 'w') {optionPicked = 1;}
 		if (input == ' ' && optionPicked == 1) { singleMode(); }
 		if (input == ' ' && optionPicked == 2) { multiMode(); }
+		
+		/*
+		while (end == false)
+		{
+			input = _getch();
+			if (input == 'w' || input == 's')
+			{
+				if (input == 's' && option == 1) { option++; }
+				if (input == 'w' && option == 2) { option--; }
+			}
+			optionPicked = option;
+			if (input == 13) { enter = true; end = true; }
+		}
+		*/
+
+			/*
+			int choice;
+			while (title == true)
+			{
+				choice = _getch();
+				if (choice == '1')
+				{
+					title = false;
+					singleMode();
+				}
+				else if (choice == '2')
+				{
+					title = false;
+					multiMode();
+				}
+			}
+			*/
 	}
 }
