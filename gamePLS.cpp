@@ -247,7 +247,8 @@ void singleMode()
 		case ' ':
 			if (bulletOrNaw == true) 
 			{
-				bulletController();
+				thread E(bulletController);
+				E.detach();
 			}
 			break;
 		}
